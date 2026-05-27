@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>СберБанк</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f2f4f7;
+            min-height: 100vh;
+        }
+
+        /* ЭКРАН ВХОДА */
+        .login-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: white;
+            z-index: 200;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .sber-logo svg {
+            width: 72px;
+            height: 72px;
+        }
+
+        .greeting {
+            font-size: 28px;
+            font-weight: 700;
+            margin: 20px 0 8px;
+        }
+
+        .phone-input {
+            width: 85%;
+            max-width: 320px;
+            padding: 16px;
+            border: 1px solid #ccc;
+            border-radius: 14px;
+            font-size: 17px;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .next-btn {
+            background: #2E7D32;
+            color: white;
+            border: none;
+            border-radius: 14px;
+            padding: 16px 32px;
+            font-size: 17px;
+            font-weight: 600;
+            width: 85%;
+            max-width: 320px;
+        }
+
+        .password-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: white;
+            z-index: 199;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .password-dots {
+            display: flex;
+            gap: 20px;
+            margin: 32px 0;
+        }
+
+        .dot {
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: #ccc;
+        }
+
+        .dot.filled {
+            background: #2E7D32;
+        }
+
+        .password-keyboard {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            max-width: 280px;
+        }
+
+        .key {
+            background: #f5f5f5;
+            border-radius: 50px;
+            padding: 18px;
+            font-size: 26px;
+            text-align: center;
+            cursor: pointer;
+        }
+
+        .main-app {
+            display: none;
+            padding: 20px;
+        }
+
+        .main-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .avatar {
+            width: 48px;
+            height: 48px;
+            background: #2E7D32;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 20px;
+        }
+
+        .bank-card {
+            background: linear-gradient(135deg, #1B5E20, #2E7D32);
+            border-radius: 28px;
+            padding: 24px;
+            color: white;
+            margin-bottom: 20px;
+        }
+
+        .card-balance {
+            font-size: 34px;
+            font-weight: 800;
+            margin: 12px 0;
+        }
+
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            background: white;
+            padding: 16px;
+            border-radius: 24px;
+            margin-bottom: 20px;
+        }
+
+        .action {
+            text-align: center;
+        }
+
+        .action-icon {
+            background: #e8f5e9;
+            width: 52px;
+            height: 52px;
+            border-radius: 52px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 8px;
+            font-size: 24px;
+        }
+
+        .transfer-section {
+            background: white;
+            border-radius: 24px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .transfer-field {
+            margin-bottom: 16px;
+        }
+
+        .transfer-field input {
+            width: 100%;
+            padding: 14px;
+            border: 1px solid #ddd;
+            border-radius: 14px;
+            font-size: 16px;
+        }
+
+        .hidden-editor {
+            position: fixed;
+            bottom: 100px;
+            left: 20px;
+            right: 20px;
+            background: white;
+            border-radius: 28px;
+            padding: 20px;
+            display: none;
+            z-index: 300;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+    </style>
+</head>
+<body>
+
+<div class="login-screen" id="loginScreen">
+    <div class="sber-logo">
+        <svg viewBox="0 0 100 100">
+            <circle cx="50" cy="50" r="48" fill="#2E7D32"/>
+            <path d="M35 50 L45 60 L65 40" stroke="white" stroke-width="5" fill="none"/>
+        </svg>
+    </div>
+    <div class="greeting">СберБанк</div>
+    <input type="tel" class="phone-input" id="phoneInput" placeholder="+7 999 123-45-67" value="+7 999 123-45-67">
+    <button class="next-btn" id="nextBtn">Продолжить</button>
+</div>
+
+<div class="password-screen" id="passwordScreen">
+    <div class="sber-logo">
+        <svg width="60" height="60" viewBox="0 0 100 100">
+            <circle cx="50" cy="50" r="48" fill="#2E7D32"/>
+            <path d="M35 50 L45 60 L65 40" stroke="white" stroke-width="5" fill="none"/>
+        </svg>
+    </div>
+    <div class="greeting" style="font-size: 22px;">Введите пароль</div>
+    <div class="password-dots" id="passwordDots">
+        <div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
+    </div>
+    <div class="password-keyboard" id="passwordKeyboard">
+        <div class="key" data-key="1">1</div><div class="key" data-key="2">2</div><div class="key" data-key="3">3</div>
+        <div class="key" data-key="4">4</div><div class="key" data-key="5">5</div><div class="key" data-key="6">6</div>
+        <div class="key" data-key="7">7</div><div class="key" data-key="8">8</div><div class="key" data-key="9">9</div>
+        <div class="key" data-key="del">⌫</div><div class="key" data-key="0">0</div><div class="key" data-key="ok">OK</div>
+    </div>
+</div>
+
+<div class="main-app" id="mainApp">
+    <div class="main-header">
+        <div class="user-greeting" id="userName">Алексей</div>
+        <div class="avatar" id="logoAvatar">А</div>
+    </div>
+    <div class="bank-card">
+        <div>💳 СберКарта</div>
+        <div class="card-balance" id="balance">150 000 ₽</div>
+        <div>•••• 5200</div>
+    </div>
+    <div class="quick-actions">
+        <div class="action"><div class="action-icon">💸</div><div>Переводы</div></div>
+        <div class="action"><div class="action-icon">📱</div><div>Платежи</div></div>
+        <div class="action"><div class="action-icon">📊</div><div>История</div></div>
+        <div class="action"><div class="action-icon">🏦</div><div>Вклады</div></div>
+    </div>
+    <div class="transfer-section">
+        <div class="section-header" style="font-size: 18px; font-weight: 700; margin-bottom: 16px;">Перевод</div>
+        <div class="transfer-field">
+            <input type="text" id="recipient" placeholder="Получатель">
+        </div>
+        <div class="transfer-field">
+            <input type="number" id="amount" placeholder="Сумма">
+        </div>
+        <button class="next-btn" id="transferBtn" style="width: 100%;">Перевести</button>
+    </div>
+</div>
+
+<div class="hidden-editor" id="hiddenEditor">
+    <h4>🔧 Редактор</h4>
+    <input type="number" id="editBalance" placeholder="Новый баланс">
+    <input type="text" id="editPassword" placeholder="Новый пароль (4 цифры)" maxlength="4">
+    <input type="text" id="editName" placeholder="Имя">
+    <button id="saveEditorBtn" style="background:#ff9800; border:none; padding:14px; border-radius:40px; margin-top:10px;">Сохранить</button>
+</div>
+
+<script>
+    let currentPassword = "1234";
+    let balance = 150000;
+    let userName = "Алексей";
+    let enteredPassword = "";
+    let history = [];
+    let lastTap = 0;
+
+    const loginScreen = document.getElementById('loginScreen');
+    const passwordScreen = document.getElementById('passwordScreen');
+    const mainApp = document.getElementById('mainApp');
+    const balanceEl = document.getElementById('balance');
+    const userNameEl = document.getElementById('userName');
+    const avatar = document.getElementById('logoAvatar');
+    const hiddenEditor = document.getElementById('hiddenEditor');
+
+    function updateUI() {
+        balanceEl.innerText = balance.toLocaleString('ru-RU') + ' ₽';
+        userNameEl.innerText = userName;
+        avatar.innerText = userName.charAt(0);
+    }
+
+    document.getElementById('nextBtn').onclick = () => {
+        loginScreen.style.display = 'none';
+        passwordScreen.style.display = 'flex';
+    };
+
+    document.querySelectorAll('.key').forEach(key => {
+        key.onclick = () => {
+            const val = key.getAttribute('data-key');
+            if (val === 'del') enteredPassword = enteredPassword.slice(0, -1);
+            else if (val === 'ok') {
+                if (enteredPassword === currentPassword) {
+                    passwordScreen.style.display = 'none';
+                    mainApp.style.display = 'block';
+                    updateUI();
+                    enteredPassword = "";
+                } else alert("Неверный пароль");
+                enteredPassword = "";
+            } else if (enteredPassword.length < 4) enteredPassword += val;
+
+            document.querySelectorAll('.dot').forEach((dot, i) => {
+                if (i < enteredPassword.length) dot.classList.add('filled');
+                else dot.classList.remove('filled');
+            });
+        };
+    });
+
+    avatar.addEventListener('click', () => {
+        const now = Date.now();
+        if (now - lastTap < 500) {
+            hiddenEditor.style.display = hiddenEditor.style.display === 'none' ? 'block' : 'none';
+            lastTap = 0;
+        } else lastTap = now;
+    });
+
+    document.getElementById('saveEditorBtn').onclick = () => {
+        const nb = parseFloat(document.getElementById('editBalance').value);
+        if (!isNaN(nb) && nb >= 0) balance = nb;
+        const np = document.getElementById('editPassword').value;
+        if (np && /^\d{4}$/.test(np)) currentPassword = np;
+        const nn = document.getElementById('editName').value;
+        if (nn.trim()) userName = nn.trim();
+        updateUI();
+        hiddenEditor.style.display = 'none';
+        document.getElementById('editBalance').value = '';
+        document.getElementById('editPassword').value = '';
+        document.getElementById('editName').value = '';
+        alert("Сохранено");
+    };
+
+    document.getElementById('transferBtn').onclick = () => {
+        const amount = parseFloat(document.getElementById('amount').value);
+        const recipient = document.getElementById('recipient').value.trim();
+        if (!amount || amount <= 0) return alert("Введите сумму");
+        if (!recipient) return alert("Введите получателя");
+        if (amount > balance) return alert("Недостаточно средств");
+        balance -= amount;
+        updateUI();
+        alert(`Перевод ${amount} ₽ для ${recipient} выполнен`);
+        document.getElementById('amount').value = '';
+        document.getElementById('recipient').value = '';
+    };
+
+    updateUI();
+</script>
+</body>
+</html>
